@@ -1,0 +1,6 @@
+[submodule "proxy"]
+	path = proxy
+	url = https://github.com/AlexGeniusMan/RT-Hack-2021-RealityX-Proxy
+[submodule "backend"]
+	path = backend
+	url = https://github.com/AlexGeniusMan/RT-Hack-2021-RealityX-Backend
