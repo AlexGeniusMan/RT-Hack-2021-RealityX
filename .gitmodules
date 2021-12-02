@@ -4,3 +4,6 @@
 [submodule "backend"]
 	path = backend
 	url = https://github.com/AlexGeniusMan/RT-Hack-2021-RealityX-Backend
+[submodule "frontend"]
+	path = frontend
+	url = https://github.com/Zayac11/RT-Hack-2021-RealityX-Frontend
