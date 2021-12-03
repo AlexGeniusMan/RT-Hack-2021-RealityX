@@ -10,12 +10,16 @@ services:
     depends_on:
       - backend
       - frontend
+    networks:
+    - net
   frontend:
     image: rt_frontend:${TAG:-latest}
     build:
       context: ./frontend
       args:
         FRONTEND_PRODUCTION_URL: ${FRONTEND_API_URL}
+    networks:
+    - net
   backend:
     image: rt_backend:${TAG:-latest}
     build:
@@ -39,8 +43,13 @@ services:
       DB_NAME: ${DB_NAME}
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
+    networks:
+    - net
 
 volumes:
   backend_static_django:
   postgres_data:
 
+networks:
+  net:
+    driver: overlay
