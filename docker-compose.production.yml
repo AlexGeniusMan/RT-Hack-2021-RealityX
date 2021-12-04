@@ -2,43 +2,29 @@ version: '3.7'
 
 services:
   proxy:
-    networks:
-    - traefik-public
-    deploy:
-      labels:
-        - traefik.enable=true
-        - traefik.docker.network=traefik-public
-        - traefik.constraint-label=traefik-public
-
-        - traefik.http.routers.rt-service.rule=Host(`${RT_DOMAIN}`)
-        - traefik.http.routers.rt-service.entrypoints=https
-        
-        - traefik.http.routers.rt-service.tls=true
-        - traefik.http.routers.rt-service.tls.certresolver=le
-        - traefik.http.services.rt-service.loadbalancer.server.port=8080
-    image: rt_proxy
+    image: rt_proxy:${TAG:-latest}
     build:
       context: ./proxy
     volumes:
-      - ./backend:/usr/src/project
       - backend_static_django:/usr/src/project/static_django
     depends_on:
       - backend
       - frontend
+    networks:
+    - net
   frontend:
-    image: rt_frontend
+    image: rt_frontend:${TAG:-latest}
     build:
       context: ./frontend
       args:
         FRONTEND_PRODUCTION_URL: ${FRONTEND_API_URL}
     networks:
-    - traefik-public
+    - net
   backend:
-    image: rt_backend
+    image: rt_backend:${TAG:-latest}
     build:
       context: ./backend
     volumes:
-      - ./backend/media/:/usr/src/project/media/
       - backend_static_django:/usr/src/project/static_django/
     environment:
       BACKEND_DEBUG_MODE: ${BACKEND_DEBUG_MODE}
@@ -49,6 +35,7 @@ services:
       DJANGO_SUPERUSER_EMAIL: ${BACKEND_SUPERUSER_EMAIL}
       DJANGO_SUPERUSER_PASSWORD: ${BACKEND_SUPERUSER_PASSWORD}
 
+      BACKEND_ML_ADDRESS: ${BACKEND_ML_ADDRESS}
       BACKEND_YANDEX_MAPS_API_KEY: ${BACKEND_YANDEX_MAPS_API_KEY}
 
       BACKEND_DEFAULT_DB: ${BACKEND_DEFAULT_DB}
@@ -57,11 +44,12 @@ services:
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
     networks:
-    - traefik-public
+    - net
+
 volumes:
   backend_static_django:
   postgres_data:
 
 networks:
-  traefik-public:
-    external: true
+  net:
+    driver: overlay
